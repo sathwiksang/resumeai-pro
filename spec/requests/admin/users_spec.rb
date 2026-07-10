@@ -91,4 +91,38 @@ RSpec.describe "Admin::Users", type: :request do
       expect(User.exists?(admin.id)).to be true
     end
   end
+
+  describe "cross-tenant isolation" do
+    let(:other_org) { create(:organization) }
+    let!(:other_user) { create(:user, organization: other_org, first_name: "Foreign") }
+
+    it "does not list users from other organizations" do
+      get admin_users_path
+      expect(response.body).not_to include("Foreign")
+    end
+
+    it "returns 404 when showing another org's user" do
+      get admin_user_path(other_user)
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "returns 404 when editing another org's user" do
+      get edit_admin_user_path(other_user)
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "returns 404 and does not modify another org's user on update" do
+      patch admin_user_path(other_user), params: { user: { first_name: "Hacked" } }
+      expect(response).to have_http_status(:not_found)
+      expect(other_user.reload.first_name).to eq("Foreign")
+    end
+
+    it "returns 404 and does not delete another org's user on destroy" do
+      expect {
+        delete admin_user_path(other_user)
+      }.not_to change(User, :count)
+      expect(response).to have_http_status(:not_found)
+      expect(User.exists?(other_user.id)).to be true
+    end
+  end
 end

@@ -1,6 +1,8 @@
 class UserPolicy < ApplicationPolicy
+  # User is not acts_as_tenant, so every check must confirm the record lives
+  # in the acting user's organization before role rules apply.
   def show?
-    user.admin? || record.id == user.id
+    same_org? && (user.admin? || record.id == user.id)
   end
 
   def create?
@@ -8,20 +10,23 @@ class UserPolicy < ApplicationPolicy
   end
 
   def update?
-    user.admin? || record.id == user.id
+    same_org? && (user.admin? || record.id == user.id)
   end
 
   def destroy?
-    user.admin? && record.id != user.id
+    same_org? && user.admin? && record.id != user.id
+  end
+
+  private
+
+  def same_org?
+    record.organization_id == user.organization_id
   end
 
   class Scope < ApplicationPolicy::Scope
     def resolve
-      if user.admin?
-        scope.all
-      else
-        scope.where(id: user.id)
-      end
+      org_scope = scope.where(organization_id: user.organization_id)
+      user.admin? ? org_scope : org_scope.where(id: user.id)
     end
   end
 end

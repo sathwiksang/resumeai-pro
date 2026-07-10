@@ -4,7 +4,7 @@ module Admin
     before_action :set_user, only: [:show, :edit, :update, :destroy]
 
     def index
-      users = policy_scope(User).order(created_at: :desc)
+      users = policy_scope(current_organization.users).order(created_at: :desc)
       @pagy, @users = pagy(users, limit: 20)
 
       render inertia: "Admin/Users/Index", props: {
@@ -74,8 +74,10 @@ module Admin
       end
     end
 
+    # Scope to the current organization — User is not acts_as_tenant, so a
+    # bare User.find would reach across tenants. Missing/foreign ids 404.
     def set_user
-      @user = User.find(params[:id])
+      @user = current_organization.users.find(params[:id])
     end
 
     def user_params

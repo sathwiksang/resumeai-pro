@@ -70,6 +70,18 @@ RSpec.describe UserPolicy, type: :model do
         expect(policy.destroy?).to be false
       end
     end
+
+    context "as an admin acting on a user in another organization" do
+      let(:other_org) { create(:organization) }
+      let(:foreign_user) { create(:user, organization: other_org) }
+      let(:policy) { described_class.new(admin, foreign_user) }
+
+      it "denies show, update, and destroy across tenants" do
+        expect(policy.show?).to be false
+        expect(policy.update?).to be false
+        expect(policy.destroy?).to be false
+      end
+    end
   end
 
   describe "scope" do
@@ -84,9 +96,16 @@ RSpec.describe UserPolicy, type: :model do
       expect(scope.pluck(:id)).to eq([candidate.id])
     end
 
-    it "shows all users for admins" do
+    it "shows all users in the admin's org for admins" do
       scope = described_class::Scope.new(admin, User).resolve
       expect(scope.count).to be >= 2
+    end
+
+    it "excludes users from other organizations for admins" do
+      other_org = create(:organization)
+      foreign = create(:user, organization: other_org)
+      scope = described_class::Scope.new(admin, User).resolve
+      expect(scope.pluck(:id)).not_to include(foreign.id)
     end
   end
 end
