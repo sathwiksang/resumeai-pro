@@ -1,0 +1,80 @@
+# Docker Compose for ResumeAI Pro local development
+# Usage: docker compose up
+
+services:
+  web:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && ./bin/rails server -p 3100 -b 0.0.0.0"
+    ports:
+      - "3100:3100"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://postgres:password@postgres:5432/resumeai_pro_development
+      OLLAMA_URL: http://ollama:11434
+      RAILS_ENV: development
+    volumes:
+      - .:/rails
+      - bundle_cache:/usr/local/bundle
+      - node_modules:/rails/node_modules
+    stdin_open: true
+    tty: true
+
+  worker:
+    build: .
+    command: bin/jobs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://postgres:password@postgres:5432/resumeai_pro_development
+      OLLAMA_URL: http://ollama:11434
+      RAILS_ENV: development
+    volumes:
+      - .:/rails
+      - bundle_cache:/usr/local/bundle
+
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: resumeai_pro_development
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      OLLAMA_NUM_PARALLEL: "2"
+      OLLAMA_MAX_QUEUE: "100"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:11434 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        reservations:
+          memory: 16G
+
+volumes:
+  pgdata:
+  ollama_data:
+  bundle_cache:
+  node_modules:

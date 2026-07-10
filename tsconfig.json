@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["vite/client"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "@/*": ["./app/javascript/*"],
+      "@components/*": ["./app/javascript/components/*"],
+      "@layouts/*": ["./app/javascript/layouts/*"],
+      "@pages/*": ["./app/javascript/pages/*"],
+      "@lib/*": ["./app/javascript/lib/*"],
+      "@hooks/*": ["./app/javascript/hooks/*"],
+      "@types/*": ["./app/javascript/types/*"]
+    }
+  },
+  "include": ["app/javascript/**/*.ts", "app/javascript/**/*.tsx", "vite.config.ts", "vitest.config.ts"],
+  "exclude": ["node_modules"]
+}

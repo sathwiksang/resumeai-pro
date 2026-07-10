@@ -1,0 +1,22 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Mass Assignment",
+      "fingerprint": "123f4279f60835e2d73816094d6f83a2c5eb4cc58db0f2a69abf41b601bcb325",
+      "check_name": "PermitAttributes",
+      "message": "Potentially dangerous key allowed for mass assignment",
+      "file": "app/controllers/admin/users_controller.rb",
+      "note": "Intentional: role assignment in admin user management, protected by Pundit admin-only authorization"
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "fingerprint": "cc52d0cd61b5f9e6fbfb83e358669a943ca6fbee988fab3be28792cfe6f713e0",
+      "check_name": "PermitAttributes",
+      "message": "Potentially dangerous key allowed for mass assignment",
+      "file": "app/controllers/admin/invitations_controller.rb",
+      "note": "Intentional: role assignment in admin invitation controller, protected by Pundit admin/recruiter authorization"
+    }
+  ],
+  "updated": "2026-03-04",
+  "brakeman_version": "8.0.4"
+}

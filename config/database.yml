@@ -1,0 +1,65 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  host: <%= ENV.fetch("DB_HOST") { nil } %>
+  port: <%= ENV.fetch("DB_PORT") { 5432 } %>
+  username: <%= ENV.fetch("DB_USERNAME") { ENV["USER"] } %>
+  password: <%= ENV.fetch("DB_PASSWORD") { "" } %>
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
+
+development:
+  primary:
+    <<: *default
+    database: resumeai_pro_development
+  queue:
+    <<: *default
+    database: resumeai_pro_queue_development
+    migrations_paths: db/queue_migrate
+  cache:
+    <<: *default
+    database: resumeai_pro_cache_development
+    migrations_paths: db/cache_migrate
+  cable:
+    <<: *default
+    database: resumeai_pro_cable_development
+    migrations_paths: db/cable_migrate
+
+test:
+  primary:
+    <<: *default
+    database: resumeai_pro_test
+  queue:
+    <<: *default
+    database: resumeai_pro_queue_test
+    migrations_paths: db/queue_migrate
+  cache:
+    <<: *default
+    database: resumeai_pro_cache_test
+    migrations_paths: db/cache_migrate
+  cable:
+    <<: *default
+    database: resumeai_pro_cable_test
+    migrations_paths: db/cable_migrate
+
+production:
+  primary: &primary_production
+    <<: *default
+    database: resumeai_pro_production
+    username: resumeai_pro
+    password: <%= ENV["RESUMEAI_PRO_DATABASE_PASSWORD"] %>
+    host: <%= ENV.fetch("DB_HOST", "localhost") %>
+    pool: <%= ENV.fetch("RAILS_MAX_THREADS", 10) %>
+    prepared_statements: true
+    advisory_locks: true
+  queue:
+    <<: *primary_production
+    database: resumeai_pro_queue_production
+    migrations_paths: db/queue_migrate
+  cache:
+    <<: *primary_production
+    database: resumeai_pro_cache_production
+    migrations_paths: db/cache_migrate
+  cable:
+    <<: *primary_production
+    database: resumeai_pro_cable_production
+    migrations_paths: db/cable_migrate

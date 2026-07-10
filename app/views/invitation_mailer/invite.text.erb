@@ -1,0 +1,10 @@
+You've been invited to join <%= @organization.name %> on ResumeAI Pro!
+
+<%= @inviter.full_name %> has invited you to join as a <%= @invitation.role %>.
+
+Accept your invitation and create your account:
+<%= @accept_url %>
+
+This invitation expires on <%= @invitation.expires_at.strftime("%B %d, %Y") %>.
+
+If you didn't expect this invitation, you can safely ignore this email.

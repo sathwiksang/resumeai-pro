@@ -1,0 +1,44 @@
+John Doe
+john.doe@email.com | +1-555-0100 | San Francisco, CA
+linkedin.com/in/johndoe | github.com/johndoe
+
+PROFESSIONAL SUMMARY
+Senior Software Engineer with 8+ years of experience building scalable web applications.
+Expert in Ruby on Rails, React, PostgreSQL, and cloud infrastructure. Passionate about
+clean code, test-driven development, and mentoring junior developers.
+
+SKILLS
+Technical: Ruby, Python, JavaScript, TypeScript, SQL, GraphQL
+Frameworks: Rails, React, Next.js, Django, Express
+Tools: Docker, Kubernetes, AWS, GCP, Terraform, GitHub Actions
+Soft Skills: Leadership, Communication, Problem Solving, Agile/Scrum
+
+EXPERIENCE
+
+Senior Software Engineer | TechCorp Inc. | San Francisco, CA
+January 2020 - Present
+- Led migration of monolithic Rails app to microservices, reducing deploy time by 70%
+- Designed and implemented real-time notification system serving 500K+ users
+- Mentored team of 4 junior engineers through structured code review process
+- Improved API response times by 45% through query optimization and caching
+
+Software Engineer | StartupXYZ | New York, NY
+June 2016 - December 2019
+- Built customer-facing dashboard using React and GraphQL
+- Implemented CI/CD pipeline reducing release cycles from weekly to daily
+- Developed automated testing framework achieving 95% code coverage
+- Collaborated with product team on feature planning and technical specifications
+
+EDUCATION
+
+Bachelor of Science in Computer Science
+Stanford University | Graduated May 2016
+GPA: 3.85 | Magna Cum Laude
+
+CERTIFICATIONS
+- AWS Solutions Architect - Associate
+- Google Cloud Professional Developer
+
+PROJECTS
+- OpenSource CLI Tool: Built a developer productivity tool in Rust with 2K+ GitHub stars
+- ML Pipeline: End-to-end machine learning pipeline using Python, TensorFlow, and Airflow
