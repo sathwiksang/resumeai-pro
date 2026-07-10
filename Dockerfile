@@ -69,9 +69,13 @@ RUN rm -rf node_modules
 # === Final stage ===
 FROM base
 
-# Non-root user for security
+# Non-root user for security. Active Storage (disk service) and the logger
+# need writable dirs that .dockerignore keeps out of the build context —
+# create them as root before dropping privileges.
 RUN groupadd --system --gid 1000 rails && \
-    useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash
+    useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
+    mkdir -p /rails/storage /rails/log /rails/tmp && \
+    chown -R rails:rails /rails/storage /rails/log /rails/tmp
 USER 1000:1000
 
 # Copy built artifacts: gems, application
