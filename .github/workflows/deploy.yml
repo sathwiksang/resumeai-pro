@@ -45,8 +45,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Prepare test databases
-        run: bin/rails db:prepare
+      - name: Prepare test databases (schema only — seeds pollute specs)
+        run: bin/rails db:test:prepare
       - name: Eager-load check (catches production boot failures)
         run: bin/rails zeitwerk:check
       - name: RuboCop
