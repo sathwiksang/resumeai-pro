@@ -9,6 +9,14 @@ puts "\n[1/3] Seeding skill taxonomy..."
 count = SkillTaxonomySeeder.seed!
 puts "      #{count} skills loaded"
 
+# ─── Step 2 & 3: Demo data — development only ───
+# Production seeds load ONLY the skill taxonomy (functional reference data).
+# Set SEED_DEMO=1 to force demo data in non-production environments.
+if Rails.env.production? && ENV["SEED_DEMO"].blank?
+  puts "\n=== Production: skipping demo organization & sample data ==="
+  exit
+end
+
 # ─── Step 2: Demo Organization ───
 puts "\n[2/3] Creating demo organization..."
 demo_org = Organization.find_or_create_by!(subdomain: "demo") do |org|
