@@ -16,6 +16,9 @@ Rails.application.routes.draw do
   get "help", to: "help#index"
   get "help/getting-started", to: "help#getting_started"
 
+  # Caddy on-demand TLS "ask" endpoint (public, no auth)
+  get "subdomains/check", to: "subdomains#check"
+
   # Authentication
   resource :session, only: [:new, :create, :destroy]
   resource :registration, only: [:new, :create]

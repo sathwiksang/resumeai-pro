@@ -1,4 +1,4 @@
-import { Head, useForm } from "@inertiajs/react"
+import { Head, useForm, usePage } from "@inertiajs/react"
 import { motion } from "framer-motion"
 import { Building2, User, Lock, Loader2, Save } from "lucide-react"
 import { useState } from "react"
@@ -24,6 +24,7 @@ interface SettingsShowProps {
 }
 
 export default function SettingsShow({ organization, user }: SettingsShowProps) {
+  const workspaceDomain = (usePage().props.workspace_domain as string) || "resume.sathwiksangeethamproject.dev"
   const [activeTab, setActiveTab] = useState<"profile" | "organization" | "password">("profile")
 
   const profileForm = useForm({
@@ -205,7 +206,12 @@ export default function SettingsShow({ organization, user }: SettingsShowProps) 
                           onChange={(e) => orgForm.setData("organization", { ...orgForm.data.organization, subdomain: e.target.value })}
                           className="h-11 w-full rounded-[var(--radius-md)] border border-border bg-surface-elevated px-4 text-sm text-foreground focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all"
                         />
-                        <span className="shrink-0 text-sm text-foreground-muted">.resumeai.pro</span>
+                        <a
+                          href={`https://${orgForm.data.organization.subdomain}.${workspaceDomain}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="shrink-0 text-sm text-brand hover:underline"
+                        >.{workspaceDomain}</a>
                       </div>
                     </div>
 

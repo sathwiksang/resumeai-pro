@@ -12,6 +12,7 @@ class ApplicationController < ActionController::Base
   # tenant explicitly.
   set_current_tenant_through_filter
   before_action :set_tenant_from_user
+  before_action :redirect_workspace_mismatch
 
   after_action :verify_authorized, unless: -> { action_name == "index" || skip_pundit? }
   after_action :verify_policy_scoped, if: -> { action_name == "index" && !skip_pundit? }
@@ -50,6 +51,7 @@ class ApplicationController < ActionController::Base
         notice: flash[:notice],
         alert: flash[:alert],
       },
+      workspace_domain: workspace_domain,
       notifications: current_user ? build_notifications : [],
     }
   end
@@ -58,6 +60,26 @@ class ApplicationController < ActionController::Base
 
   def set_tenant_from_user
     set_current_tenant(current_user&.organization)
+  end
+
+  def workspace_domain
+    Rails.application.config.x.workspace_domain
+  end
+  helper_method :workspace_domain
+
+  # Host of the form <sub>.<workspace_domain> belongs to the org with that
+  # subdomain. Signed-in users visiting another org's workspace URL are
+  # bounced to their own; anonymous visitors may load any workspace's login.
+  def redirect_workspace_mismatch
+    suffix = ".#{workspace_domain}"
+    return unless request.host.end_with?(suffix)
+    return unless authenticated? && current_organization
+
+    requested = request.host.delete_suffix(suffix)
+    return if requested == current_organization.subdomain
+
+    redirect_to "#{request.protocol}#{current_organization.subdomain}#{suffix}#{request.fullpath}",
+                allow_other_host: true
   end
 
   def user_not_authorized

@@ -1,4 +1,4 @@
-import { Head, Link, useForm } from "@inertiajs/react"
+import { Head, Link, useForm, usePage } from "@inertiajs/react"
 import { motion } from "framer-motion"
 import { User, Mail, Lock, Building2, Globe, Eye, EyeOff, ArrowRight, Loader2, Check } from "lucide-react"
 import { useState } from "react"
@@ -6,6 +6,7 @@ import { GuestLayout } from "@/layouts/GuestLayout"
 import { Button } from "@/components/ui"
 
 export default function Register() {
+  const workspaceDomain = (usePage().props.workspace_domain as string) || "resume.sathwiksangeethamproject.dev"
   const [showPassword, setShowPassword] = useState(false)
   const [step, setStep] = useState<1 | 2>(1)
 
@@ -118,7 +119,7 @@ export default function Register() {
                       className="h-11 w-full rounded-[var(--radius-md)] border border-border bg-surface-elevated pl-10 pr-36 text-sm text-foreground placeholder:text-foreground-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all"
                     />
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-foreground-muted">
-                      .resumeai.pro
+                      .{workspaceDomain}
                     </span>
                   </div>
                 </div>
