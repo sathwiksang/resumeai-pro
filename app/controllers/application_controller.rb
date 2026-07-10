@@ -4,13 +4,14 @@ class ApplicationController < ActionController::Base
   include Pagy::Backend
   include PlanEnforceable
 
-  # In development/test, skip subdomain-based tenancy — use user's org instead
-  if Rails.env.development? || Rails.env.test?
-    set_current_tenant_through_filter
-    before_action :set_tenant_from_user
-  else
-    set_current_tenant_by_subdomain(:organization, :subdomain)
-  end
+  # Tenant = the signed-in user's organization, in every environment. The app
+  # is served from a single host (no per-org subdomains), so subdomain-based
+  # resolution leaves the tenant nil on all production requests — 500s on any
+  # page that dereferences current_organization, and unscoped tenant queries
+  # everywhere else. Public token flows (invitation acceptance) set their own
+  # tenant explicitly.
+  set_current_tenant_through_filter
+  before_action :set_tenant_from_user
 
   after_action :verify_authorized, unless: -> { action_name == "index" || skip_pundit? }
   after_action :verify_policy_scoped, if: -> { action_name == "index" && !skip_pundit? }
