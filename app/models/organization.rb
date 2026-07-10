@@ -6,9 +6,18 @@ class Organization < ApplicationRecord
   has_many :invitations, dependent: :destroy
   has_many :billing_events, dependent: :destroy
 
+  # Subdomains that must never become an org workspace host — they either
+  # collide with real app hosts or are conventional infra names.
+  RESERVED_SUBDOMAINS = %w[
+    www api admin app resume mail smtp ftp ns dns cdn assets static
+    dashboard billing account auth login signup help support docs status
+    staging test dev demo internal root system
+  ].freeze
+
   validates :name, presence: true
   validates :subdomain, presence: true, uniqueness: true,
-            format: { with: /\A[a-z0-9\-]+\z/, message: "only allows lowercase letters, numbers, and hyphens" }
+            format: { with: /\A[a-z0-9\-]+\z/, message: "only allows lowercase letters, numbers, and hyphens" },
+            exclusion: { in: RESERVED_SUBDOMAINS, message: "is reserved and can't be used" }
   validates :plan, inclusion: { in: %w[free pro enterprise] }
   validates :monthly_analysis_limit, numericality: { greater_than_or_equal_to: 0 }
 

@@ -36,6 +36,14 @@ RSpec.describe Organization, type: :model do
         subject.subdomain = "my org"
         expect(subject).not_to be_valid
       end
+
+      it "rejects reserved subdomains" do
+        %w[www api admin app resume].each do |reserved|
+          subject.subdomain = reserved
+          expect(subject).not_to be_valid, "expected #{reserved.inspect} to be reserved"
+          expect(subject.errors[:subdomain]).to include("is reserved and can't be used")
+        end
+      end
     end
   end
 

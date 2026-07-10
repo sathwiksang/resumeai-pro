@@ -8,7 +8,11 @@ Rails.application.configure do
     policy.img_src     :self, :data, :https
     policy.object_src  :none
     policy.script_src  :self
-    policy.style_src   :self
+    # The React/Inertia UI uses CSS-in-JS (framer-motion) which injects inline
+    # style attributes that can't be nonced, so styles must allow inline.
+    # Scripts stay nonce-strict (no unsafe-inline), which is where XSS bites.
+    policy.style_src   :self, :unsafe_inline
+    policy.style_src_attr :unsafe_inline
     policy.connect_src :self
     policy.frame_ancestors :none
     policy.base_uri    :self
@@ -28,12 +32,13 @@ Rails.application.configure do
     policy.script_src(*policy.script_src, :blob) if Rails.env.test?
   end
 
-  # Use nonces for inline scripts/styles.
-  # Random per request — session.id is nil for anonymous visitors, which
-  # produced invalid empty 'nonce-' sources that browsers ignore.
+  # Nonce inline scripts only. style-src intentionally allows unsafe-inline
+  # (CSS-in-JS) — if it were also in the nonce list the browser would ignore
+  # unsafe-inline and block the injected styles.
   config.content_security_policy_nonce_generator = ->(_request) { SecureRandom.base64(16) }
-  config.content_security_policy_nonce_directives = %w[script-src style-src]
+  config.content_security_policy_nonce_directives = %w[script-src]
 
-  # Report-only mode initially to avoid breaking things
-  config.content_security_policy_report_only = true
+  # Enforce in production; report-only elsewhere (keeps Vite HMR unblocked in
+  # dev and avoids interfering with the test pipeline).
+  config.content_security_policy_report_only = !Rails.env.production?
 end
