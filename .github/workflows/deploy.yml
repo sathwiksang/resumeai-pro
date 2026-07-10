@@ -54,6 +54,20 @@ jobs:
       - name: RSpec
         run: bundle exec rspec --format progress
 
+  security:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - name: Brakeman (static security analysis)
+        run: bin/brakeman --no-pager
+        continue-on-error: true # informational until findings are triaged in the uplift pass
+      - name: bundler-audit (known CVEs)
+        run: bin/bundler-audit
+        continue-on-error: true
+
   build-and-deploy:
     needs: ci
     runs-on: ubuntu-24.04-arm
