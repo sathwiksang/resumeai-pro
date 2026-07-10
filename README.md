@@ -10,6 +10,13 @@ Production-grade SaaS platform for AI-powered resume scoring. Upload resumes, de
 - **Billing:** Stripe (optional, dev mode works without it)
 - **Deployment:** Docker, Kamal 2, GitHub Actions CI/CD
 
+## Live & docs
+
+- **Live:** https://resume.sathwiksangeethamproject.dev (AWS EC2, production build, CI-gated deploys)
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — system design and key decisions
+- [docs/RUNBOOK.md](docs/RUNBOOK.md) — deploys, SSM host access, failure playbook
+- [docs/SECURITY.md](docs/SECURITY.md) — security posture and uplift backlog
+
 ## Prerequisites
 
 - Ruby 3.4+
