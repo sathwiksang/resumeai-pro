@@ -28,8 +28,10 @@ Rails.application.configure do
     policy.script_src(*policy.script_src, :blob) if Rails.env.test?
   end
 
-  # Use nonces for inline scripts/styles
-  config.content_security_policy_nonce_generator = ->(request) { request.session.id.to_s }
+  # Use nonces for inline scripts/styles.
+  # Random per request — session.id is nil for anonymous visitors, which
+  # produced invalid empty 'nonce-' sources that browsers ignore.
+  config.content_security_policy_nonce_generator = ->(_request) { SecureRandom.base64(16) }
   config.content_security_policy_nonce_directives = %w[script-src style-src]
 
   # Report-only mode initially to avoid breaking things
