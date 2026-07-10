@@ -19,7 +19,15 @@ export function TopBar({ sidebarCollapsed }: TopBarProps) {
   const menuRef = useRef<HTMLDivElement>(null)
   const notifRef = useRef<HTMLDivElement>(null)
   const searchRef = useRef<HTMLInputElement>(null)
+  const [searchTerm, setSearchTerm] = useState("")
   const { isDark, toggle: toggleDark } = useDarkMode()
+
+  function submitSearch(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key !== "Enter") return
+    const q = searchTerm.trim()
+    if (q.length === 0) return
+    router.visit(`/resumes?search=${encodeURIComponent(q)}`)
+  }
 
   // Track read notifications in localStorage
   const [readIds, setReadIds] = useState<number[]>(() => {
@@ -86,7 +94,10 @@ export function TopBar({ sidebarCollapsed }: TopBarProps) {
           <input
             ref={searchRef}
             type="text"
-            placeholder="Search resumes, scores..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={submitSearch}
+            placeholder="Search resumes..."
             className="h-9 w-64 rounded-[var(--radius-md)] border border-border bg-surface-elevated pl-9 pr-14 text-sm text-foreground placeholder:text-foreground-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all"
           />
           <kbd className="absolute right-3 top-1/2 -translate-y-1/2 rounded border border-border bg-surface px-1.5 py-0.5 text-[10px] font-mono text-foreground-muted">

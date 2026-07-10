@@ -211,6 +211,8 @@ export interface SharedProps {
     alert?: string
   }
   notifications: AppNotification[]
+  workspace_domain?: string
+  llm_model?: string
 }
 
 // === Pagination ===

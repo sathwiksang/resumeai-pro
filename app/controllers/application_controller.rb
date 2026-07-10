@@ -52,6 +52,7 @@ class ApplicationController < ActionController::Base
         alert: flash[:alert],
       },
       workspace_domain: workspace_domain,
+      llm_model: OllamaService::CHAT_MODEL,
       notifications: current_user ? build_notifications : [],
     }
   end

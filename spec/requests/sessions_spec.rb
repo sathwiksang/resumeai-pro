@@ -35,10 +35,11 @@ RSpec.describe "Sessions", type: :request do
   end
 
   describe "DELETE /session" do
-    it "logs the user out" do
+    it "logs the user out and shows a confirmation on the login page" do
       sign_in(user)
       delete session_path
-      expect(response).to redirect_to(root_path)
+      expect(response).to redirect_to(new_session_path)
+      expect(flash[:notice]).to eq("You have been logged out.")
     end
   end
 end

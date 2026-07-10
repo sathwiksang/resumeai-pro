@@ -59,7 +59,8 @@ const helpNav: NavItem[] = [
 ]
 
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
-  const { auth } = usePage<SharedProps>().props
+  const { auth, llm_model } = usePage<SharedProps>().props
+  const modelLabel = (llm_model as string) || "Local model"
   const isAdmin = auth.user?.role === "admin"
   const isRecruiter = auth.user?.role === "recruiter" || isAdmin
 
@@ -109,8 +110,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
               <span className="inline-flex h-2.5 w-2.5 rounded-full bg-success" />
             </span>
             <div className="flex flex-col">
-              <span className="text-xs font-medium text-foreground">LLM Online</span>
-              <span className="text-xs text-foreground-muted">Qwen 2.5 3B</span>
+              <span className="text-xs font-medium text-foreground">Local AI</span>
+              <span className="text-xs text-foreground-muted">{modelLabel}</span>
             </div>
           </div>
         </div>

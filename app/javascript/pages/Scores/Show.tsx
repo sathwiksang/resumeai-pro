@@ -5,7 +5,7 @@ import {
   ArrowLeft, FileText, Briefcase, Clock, Brain,
   Target, GraduationCap, Code, Palette, AlertTriangle,
   Loader2, Zap, BarChart3, Lightbulb, Search,
-  Layers, Download,
+  Layers, Download, Trash2,
 } from "lucide-react"
 import { AuthenticatedLayout } from "@/layouts/AuthenticatedLayout"
 import { Card, CardContent, CardHeader, CardTitle, Badge, Button, Tabs } from "@/components/ui"
@@ -141,15 +141,30 @@ export default function ScoreShow({ score }: ScoreShowProps) {
         <h1 className="font-display text-lg font-bold text-foreground">
           Resume Score Analysis
         </h1>
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => window.print()}
-          className="gap-1.5 print:hidden"
-        >
-          <Download className="h-3.5 w-3.5" />
-          Export PDF
-        </Button>
+        <div className="flex items-center gap-2 print:hidden">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => window.print()}
+            className="gap-1.5"
+          >
+            <Download className="h-3.5 w-3.5" />
+            Export PDF
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              if (confirm("Delete this score analysis? This cannot be undone.")) {
+                router.delete(`/resume_scores/${score.id}`)
+              }
+            }}
+            className="gap-1.5 text-foreground-muted hover:text-destructive"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            Delete
+          </Button>
+        </div>
       </div>
 
       {/* Hero Section: Gauge + Info */}

@@ -4,14 +4,15 @@
 Rails.application.configure do
   config.content_security_policy do |policy|
     policy.default_src :self
-    policy.font_src    :self, :data
+    policy.font_src    :self, :data, "https://fonts.gstatic.com"
     policy.img_src     :self, :data, :https
     policy.object_src  :none
     policy.script_src  :self
     # The React/Inertia UI uses CSS-in-JS (framer-motion) which injects inline
     # style attributes that can't be nonced, so styles must allow inline.
+    # Google Fonts serves its stylesheet from fonts.googleapis.com.
     # Scripts stay nonce-strict (no unsafe-inline), which is where XSS bites.
-    policy.style_src   :self, :unsafe_inline
+    policy.style_src   :self, :unsafe_inline, "https://fonts.googleapis.com"
     policy.style_src_attr :unsafe_inline
     policy.connect_src :self
     policy.frame_ancestors :none

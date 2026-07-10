@@ -18,7 +18,9 @@ class SessionsController < ApplicationController
 
   def destroy
     terminate_session
-    redirect_to root_path, notice: "You have been logged out."
+    # Land on the login page (GuestLayout renders flash) so the confirmation
+    # is actually shown — the marketing landing page has no flash region.
+    redirect_to new_session_path, notice: "You have been logged out."
   end
 
   private

@@ -34,7 +34,7 @@ module Admin
             key: "enterprise",
             price: 99,
             analyses_per_month: -1,
-            features: ["Unlimited analyses", "Custom AI models", "Unlimited team members", "Dedicated support", "API access", "Custom integrations", "SSO"],
+            features: ["Unlimited analyses", "Custom AI models", "Up to 25 team members", "Dedicated support", "API access", "Custom integrations", "SSO"],
           },
         ],
         billing_events: current_organization.billing_events.recent.limit(20).map { |e|

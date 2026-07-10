@@ -163,18 +163,17 @@ function RadarChart({ scores, maxScore = 100, className }: RadarChartProps) {
 
             {/* Score fill area */}
             <motion.path
-              d={buildPolygonPath(Array(n).fill(0), maxScore)}
+              initial={{ d: buildPolygonPath(Array(n).fill(0), maxScore) }}
               animate={{ d: dataPath }}
               transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
               fill="url(#scoreGradient)"
-              stroke="url(#scoreStroke)"
               strokeWidth={0}
               filter="url(#scoreGlow)"
             />
 
             {/* Score outline */}
             <motion.path
-              d={buildPolygonPath(Array(n).fill(0), maxScore)}
+              initial={{ d: buildPolygonPath(Array(n).fill(0), maxScore) }}
               animate={{ d: dataPath }}
               transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
               fill="none"
@@ -217,8 +216,7 @@ function RadarChart({ scores, maxScore = 100, className }: RadarChartProps) {
 
                   {/* Data dot */}
                   <motion.circle
-                    cx={CX}
-                    cy={CY}
+                    initial={{ cx: CX, cy: CY, r: 4.5 }}
                     animate={{
                       cx: x,
                       cy: y,
