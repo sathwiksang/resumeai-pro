@@ -12,6 +12,23 @@ RSpec.describe "Resumes", type: :request do
       get resumes_path
       expect(response).to have_http_status(:ok)
     end
+
+    it "filters by the search term against filename" do
+      create(:resume, user: user, organization: organization, filename: "alice_nguyen.pdf")
+      create(:resume, user: user, organization: organization, filename: "bob_smith.pdf")
+      get resumes_path(search: "alice")
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("alice_nguyen.pdf")
+      expect(response.body).not_to include("bob_smith.pdf")
+    end
+
+    it "filters by status" do
+      create(:resume, user: user, organization: organization, filename: "ready_one.pdf", status: :ready)
+      create(:resume, user: user, organization: organization, filename: "pending_one.pdf", status: :pending)
+      get resumes_path(status: "ready")
+      expect(response.body).to include("ready_one.pdf")
+      expect(response.body).not_to include("pending_one.pdf")
+    end
   end
 
   describe "GET /resumes/new" do

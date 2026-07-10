@@ -3,6 +3,10 @@ class ResumesController < ApplicationController
 
   def index
     resumes = policy_scope(Resume).order(created_at: :desc)
+    resumes = resumes.where(status: params[:status]) if params[:status].present?
+    if params[:search].present?
+      resumes = resumes.where("filename ILIKE ?", "%#{params[:search].strip}%")
+    end
     @pagy, @resumes = pagy(resumes)
 
     render inertia: "Resumes/Index", props: {

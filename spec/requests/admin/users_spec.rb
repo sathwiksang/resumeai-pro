@@ -57,6 +57,21 @@ RSpec.describe "Admin::Users", type: :request do
       post admin_users_path, params: { user: { email_address: "" } }
       expect(response).to redirect_to(new_admin_user_path)
     end
+
+    it "shows a friendly limit message (not a 500) when at the member limit" do
+      # Free plan allows 2 members; the admin is #1, add #2 to reach the cap.
+      create(:user, organization: organization)
+      organization.update!(users_count: organization.users.count)
+
+      expect {
+        post admin_users_path, params: {
+          user: { first_name: "Over", last_name: "Limit", email_address: "over@example.com",
+                  role: "candidate", password: "password123", password_confirmation: "password123" },
+        }
+      }.not_to change(User, :count)
+      expect(response).to have_http_status(:redirect)
+      expect(flash[:alert]).to include("team member limit")
+    end
   end
 
   describe "GET /admin/users/:id/edit" do

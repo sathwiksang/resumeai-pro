@@ -26,10 +26,14 @@ module Admin
     end
 
     def create
-      return unless enforce_member_limit!
-
+      # Authorize before the plan-limit check: enforce_member_limit! can
+      # redirect and return early, and if authorize never ran the
+      # verify_authorized after_action would raise (500) instead of showing
+      # the friendly limit message.
       user = current_organization.users.build(user_params)
       authorize user
+
+      return unless enforce_member_limit!
 
       if user.save
         redirect_to admin_users_path, notice: "#{user.full_name} has been invited."

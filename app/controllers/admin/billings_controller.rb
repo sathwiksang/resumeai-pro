@@ -52,8 +52,15 @@ module Admin
     def create_checkout
       plan = params[:plan]
 
-      unless %w[pro enterprise].include?(plan)
+      unless %w[free pro enterprise].include?(plan)
         redirect_to admin_billing_path, alert: "Invalid plan."
+        return
+      end
+
+      # Downgrading to Free never requires payment, so always allow it.
+      if plan == "free"
+        current_organization.upgrade_plan!("free")
+        redirect_to admin_billing_path, notice: "Your plan has been changed to Free."
         return
       end
 

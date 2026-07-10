@@ -49,6 +49,17 @@ RSpec.describe "Admin::Billings", type: :request do
       end
     end
 
+    context "downgrading to free" do
+      it "always switches to free without payment or demo mode" do
+        org.update!(plan: "pro", monthly_analysis_limit: 200)
+        sign_in(admin)
+        post create_checkout_admin_billing_path, params: { plan: "free" }
+        expect(org.reload.plan).to eq("free")
+        expect(response).to redirect_to(admin_billing_path)
+        expect(flash[:notice]).to include("Free")
+      end
+    end
+
     context "in demo mode (DEMO_BILLING=1)" do
       around do |example|
         ENV["DEMO_BILLING"] = "1"
