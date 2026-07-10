@@ -34,7 +34,7 @@ jobs:
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: System deps (PDF/OCR used by specs)
         run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils tesseract-ocr libvips
       - uses: ruby/setup-ruby@v1
@@ -57,7 +57,7 @@ jobs:
   security:
     runs-on: ubuntu-24.04-arm
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
@@ -72,7 +72,7 @@ jobs:
     needs: ci
     runs-on: ubuntu-24.04-arm
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Assume AWS deploy role (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
