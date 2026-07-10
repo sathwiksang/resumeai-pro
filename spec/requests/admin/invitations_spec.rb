@@ -33,6 +33,15 @@ RSpec.describe "Admin::Invitations", type: :request do
       get admin_invitations_path
       expect(response).to have_http_status(:ok)
     end
+
+    it "exposes a copyable invite URL for pending invitations" do
+      sign_in(admin)
+      invitation = ActsAsTenant.with_tenant(org) do
+        create(:invitation, organization: org, invited_by: admin)
+      end
+      get admin_invitations_path
+      expect(response.body).to include("/invitations/#{invitation.token}")
+    end
   end
 
   describe "POST /admin/invitations" do

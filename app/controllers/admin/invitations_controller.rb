@@ -79,6 +79,9 @@ module Admin
         expires_at: invitation.expires_at.iso8601,
         accepted_at: invitation.accepted_at&.iso8601,
         created_at: invitation.created_at.iso8601,
+        # Deliverability fallback: admins can hand the accept link to the
+        # invitee directly if the email doesn't arrive.
+        invite_url: (invitation.pending? ? "#{request.protocol}#{request.host_with_port}/invitations/#{invitation.token}" : nil),
       }
     end
   end

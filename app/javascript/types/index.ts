@@ -177,6 +177,7 @@ export interface Invitation {
   expires_at: string
   accepted_at: string | null
   created_at: string
+  invite_url: string | null
 }
 
 export interface BillingEvent {

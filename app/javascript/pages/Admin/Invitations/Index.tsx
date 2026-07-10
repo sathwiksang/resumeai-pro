@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Head, router } from "@inertiajs/react"
-import { Mail, Clock, CheckCircle, XCircle, Send } from "lucide-react"
+import { Mail, Clock, CheckCircle, XCircle, Send, Copy, Check } from "lucide-react"
 import { AuthenticatedLayout } from "@/layouts/AuthenticatedLayout"
 import {
   Card, CardContent, CardHeader, CardTitle,
@@ -44,6 +44,15 @@ export default function InvitationsIndex({ invitations, member_count, member_lim
         setEmail("")
       },
     })
+  }
+
+  const [copiedId, setCopiedId] = useState<number | null>(null)
+
+  const handleCopyLink = async (inv: Invitation) => {
+    if (!inv.invite_url) return
+    await navigator.clipboard.writeText(inv.invite_url)
+    setCopiedId(inv.id)
+    setTimeout(() => setCopiedId(null), 2000)
   }
 
   const handleResend = (id: number) => {
@@ -137,6 +146,10 @@ export default function InvitationsIndex({ invitations, member_count, member_lim
                         <td className="py-3">
                           {inv.status === "pending" && (
                             <div className="flex gap-2">
+                              <Button variant="ghost" size="sm" onClick={() => handleCopyLink(inv)} aria-label="Copy invite link">
+                                {copiedId === inv.id ? <Check className="h-3.5 w-3.5 mr-1" /> : <Copy className="h-3.5 w-3.5 mr-1" />}
+                                {copiedId === inv.id ? "Copied" : "Copy link"}
+                              </Button>
                               <Button variant="ghost" size="sm" onClick={() => handleResend(inv.id)}>
                                 Resend
                               </Button>
