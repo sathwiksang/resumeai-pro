@@ -1,0 +1,64 @@
+# Build the production image (Rails + precompiled Vite assets) on a native
+# ARM runner, push to ECR, roll the portfolio EC2 host via SSM (OIDC, no SSH).
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write # OIDC
+  contents: read
+
+concurrency: deploy-resumeai
+
+env:
+  ECR: 606114586218.dkr.ecr.us-east-1.amazonaws.com
+  INSTANCE: i-0f862e6a8a78d505a
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assume AWS deploy role (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::606114586218:role/portfolio-github-deploy
+          aws-region: us-east-1
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build & push image
+        run: |
+          docker build . \
+            -t $ECR/portfolio/resumeai:${{ github.sha }} -t $ECR/portfolio/resumeai:latest
+          docker push $ECR/portfolio/resumeai:${{ github.sha }}
+          docker push $ECR/portfolio/resumeai:latest
+
+      - name: Roll the host (pull + up) via SSM
+        run: |
+          CMD_ID=$(aws ssm send-command \
+            --instance-ids $INSTANCE \
+            --document-name AWS-RunShellScript \
+            --timeout-seconds 600 \
+            --parameters 'commands=["set -e; cd /opt/portfolio; aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 606114586218.dkr.ecr.us-east-1.amazonaws.com > /dev/null; docker compose pull -q resumeai-pro; docker compose up -d resumeai-pro; sleep 30; docker compose ps resumeai-pro"]' \
+            --query 'Command.CommandId' --output text)
+          for i in $(seq 1 30); do
+            STATUS=$(aws ssm get-command-invocation --command-id $CMD_ID --instance-id $INSTANCE --query 'Status' --output text)
+            [ "$STATUS" = "Success" ] && break
+            [ "$STATUS" = "Failed" ] && { aws ssm get-command-invocation --command-id $CMD_ID --instance-id $INSTANCE --query 'StandardErrorContent' --output text; exit 1; }
+            sleep 10
+          done
+          aws ssm get-command-invocation --command-id $CMD_ID --instance-id $INSTANCE --query 'StandardOutputContent' --output text | tail -5
+
+      - name: Verify public endpoints
+        run: |
+          sleep 10
+          curl -sf https://resume.sathwiksangeethamproject.dev/up
+          BODY=$(curl -sfL https://resume.sathwiksangeethamproject.dev/)
+          echo "$BODY" | grep -q "vite-dev" && { echo "still serving dev assets"; exit 1; }
+          echo "resumeai healthy"
