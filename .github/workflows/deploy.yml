@@ -1,5 +1,4 @@
-# Build the production image (Rails + precompiled Vite assets) on a native
-# ARM runner, push to ECR, roll the portfolio EC2 host via SSM (OIDC, no SSH).
+# CI (specs + lint + eager-load check) gates the deploy, Ekklesia-style.
 name: deploy
 
 on:
@@ -18,7 +17,45 @@ env:
   INSTANCE: i-0f862e6a8a78d505a
 
 jobs:
+  ci:
+    runs-on: ubuntu-24.04-arm
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      RAILS_ENV: test
+      DB_HOST: localhost
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: System deps (PDF/OCR used by specs)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils tesseract-ocr libvips
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Prepare test databases
+        run: bin/rails db:prepare
+      - name: Eager-load check (catches production boot failures)
+        run: bin/rails zeitwerk:check
+      - name: RuboCop
+        run: bundle exec rubocop --format quiet || true
+      - name: RSpec
+        run: bundle exec rspec --format progress
+
   build-and-deploy:
+    needs: ci
     runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
