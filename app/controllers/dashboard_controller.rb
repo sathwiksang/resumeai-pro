@@ -36,7 +36,7 @@ class DashboardController < ApplicationController
       usage: if current_organization
                {
                  used: current_organization.analyses_used_this_month,
-                 limit: current_organization.monthly_analysis_limit,
+                 limit: current_organization.effective_analysis_limit,
                  plan: current_organization.plan,
                }
              end,

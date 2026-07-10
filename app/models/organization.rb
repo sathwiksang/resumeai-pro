@@ -17,6 +17,14 @@ class Organization < ApplicationRecord
     analyses_used_this_month < monthly_analysis_limit
   end
 
+  # Effective monthly analysis allowance for display. -1 means unlimited
+  # (Enterprise), matching the plan_limits serialization the UI already uses;
+  # avoids showing "used / 0" for Enterprise, whose raw column is 0.
+  def effective_analysis_limit
+    limit = plan_limits[:analyses]
+    limit == Float::INFINITY ? -1 : limit
+  end
+
   def increment_analysis_count!
     increment!(:analyses_used_this_month)
   end
@@ -53,11 +61,13 @@ class Organization < ApplicationRecord
 
   def usage_summary
     limits = plan_limits
+    # -1 = unlimited; Float::INFINITY is not valid JSON.
+    lim = ->(v) { v == Float::INFINITY ? -1 : v }
     {
-      resumes: { used: resumes_count, limit: limits[:resumes] },
-      job_descriptions: { used: job_descriptions_count, limit: limits[:jds] },
-      members: { used: users_count, limit: limits[:members] },
-      analyses: { used: analyses_used_this_month, limit: limits[:analyses] }
+      resumes: { used: resumes_count, limit: lim.call(limits[:resumes]) },
+      job_descriptions: { used: job_descriptions_count, limit: lim.call(limits[:jds]) },
+      members: { used: users_count, limit: lim.call(limits[:members]) },
+      analyses: { used: analyses_used_this_month, limit: lim.call(limits[:analyses]) }
     }
   end
 

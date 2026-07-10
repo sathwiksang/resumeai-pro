@@ -8,7 +8,7 @@ module Admin
           id: current_organization.id,
           name: current_organization.name,
           plan: current_organization.plan,
-          monthly_analysis_limit: current_organization.monthly_analysis_limit,
+          monthly_analysis_limit: current_organization.effective_analysis_limit,
           analyses_used_this_month: current_organization.analyses_used_this_month,
           subscription_status: current_organization.subscription_status,
           current_period_end: current_organization.current_period_end&.iso8601,

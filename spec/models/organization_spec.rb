@@ -156,6 +156,26 @@ RSpec.describe Organization, type: :model do
       expect(summary[:members]).to eq(used: 1, limit: 2)
       expect(summary[:analyses]).to eq(used: 3, limit: 10)
     end
+
+    it "serializes unlimited (enterprise) limits as -1, never Infinity" do
+      org = build(:organization, plan: "enterprise")
+      summary = org.usage_summary
+      expect(summary[:analyses][:limit]).to eq(-1)
+      expect(summary[:resumes][:limit]).to eq(-1)
+      expect(summary.values.map { |v| v[:limit] }).not_to include(Float::INFINITY)
+    end
+  end
+
+  describe "#effective_analysis_limit" do
+    it "returns the numeric limit for metered plans" do
+      expect(build(:organization, plan: "free").effective_analysis_limit).to eq(10)
+      expect(build(:organization, plan: "pro").effective_analysis_limit).to eq(200)
+    end
+
+    it "returns -1 (unlimited) for enterprise, not the raw 0 column" do
+      org = build(:organization, plan: "enterprise", monthly_analysis_limit: 0)
+      expect(org.effective_analysis_limit).to eq(-1)
+    end
   end
 
   describe "#upgrade_plan!" do
