@@ -3,9 +3,11 @@ class OllamaService
   class ModelError < StandardError; end
 
   DEFAULT_BASE_URL = "http://localhost:11434"
-  EMBED_MODEL = "nomic-embed-text"
-  CHAT_MODEL = "qwen2.5:3b"
-  FAST_MODEL = "llama3.2:3b"
+  # Models come from the environment so production can run whatever fits the
+  # host (t4g.small only fits qwen2.5:0.5b); defaults match dev hardware.
+  EMBED_MODEL = ENV.fetch("OLLAMA_EMBED_MODEL", "nomic-embed-text")
+  CHAT_MODEL = ENV.fetch("OLLAMA_MODEL", "qwen2.5:3b")
+  FAST_MODEL = ENV.fetch("OLLAMA_FAST_MODEL", "llama3.2:3b")
 
   # Maximum text length for embeddings (nomic-embed-text supports 8192 tokens)
   MAX_EMBED_TEXT_LENGTH = 30_000 # characters
