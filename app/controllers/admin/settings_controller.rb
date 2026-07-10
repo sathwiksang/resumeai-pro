@@ -37,6 +37,11 @@ module Admin
           redirect_to admin_settings_path, alert: current_user.errors.full_messages.join(", ")
         end
       when "password"
+        unless current_user.authenticate(params.dig(:user, :current_password))
+          redirect_to admin_settings_path, alert: "Current password is incorrect."
+          return
+        end
+
         if current_user.update(password_params)
           redirect_to admin_settings_path, notice: "Password updated."
         else

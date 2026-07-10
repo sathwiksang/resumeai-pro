@@ -65,10 +65,14 @@ module Admin
           cancel_url: admin_billing_url,
         )
         redirect_to session.url, allow_other_host: true
-      else
-        # Dev mode: direct plan switch
+      elsif demo_billing_enabled?
+        # Demo mode only: switch plan without payment. Never on by default —
+        # otherwise any admin could grant their org a free Enterprise plan.
         current_organization.upgrade_plan!(plan)
-        redirect_to admin_billing_path, notice: "Plan updated to #{plan} (dev mode)."
+        redirect_to admin_billing_path, notice: "Plan updated to #{plan} (demo mode — no payment taken)."
+      else
+        redirect_to admin_billing_path,
+          alert: "Billing is not enabled in this environment, so plans can't be changed."
       end
     end
 
@@ -92,6 +96,11 @@ module Admin
         redirect_to root_path, alert: "Admin access required."
       end
     end
+
+    def demo_billing_enabled?
+      ENV["DEMO_BILLING"] == "1"
+    end
+    helper_method :demo_billing_enabled?
 
     def skip_pundit?
       true

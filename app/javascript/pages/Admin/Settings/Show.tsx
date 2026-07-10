@@ -47,6 +47,7 @@ export default function SettingsShow({ organization, user }: SettingsShowProps) 
   const passwordForm = useForm({
     section: "password",
     user: {
+      current_password: "",
       password: "",
       password_confirmation: "",
     },
@@ -66,7 +67,7 @@ export default function SettingsShow({ organization, user }: SettingsShowProps) 
     e.preventDefault()
     passwordForm.put("/admin/settings", {
       onSuccess: () => {
-        passwordForm.setData("user", { password: "", password_confirmation: "" })
+        passwordForm.setData("user", { current_password: "", password: "", password_confirmation: "" })
       },
     })
   }
@@ -239,6 +240,18 @@ export default function SettingsShow({ organization, user }: SettingsShowProps) 
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handlePasswordSubmit} className="space-y-5">
+                    <div>
+                      <label className="mb-1.5 block text-sm font-medium text-foreground">Current password</label>
+                      <input
+                        type="password"
+                        required
+                        value={passwordForm.data.user.current_password}
+                        onChange={(e) => passwordForm.setData("user", { ...passwordForm.data.user, current_password: e.target.value })}
+                        placeholder="Enter your current password"
+                        className="h-11 w-full rounded-[var(--radius-md)] border border-border bg-surface-elevated px-4 text-sm text-foreground placeholder:text-foreground-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all"
+                      />
+                    </div>
+
                     <div>
                       <label className="mb-1.5 block text-sm font-medium text-foreground">New password</label>
                       <input

@@ -60,8 +60,11 @@ Rails.application.routes.draw do
     post "stripe", to: "stripe#create"
   end
 
-  # Job monitoring (admin only in production)
-  mount MissionControl::Jobs::Engine, at: "/admin/jobs"
+  # Job monitoring — Mission Control has no auth of its own, so gate the
+  # mount behind an admin-session constraint (non-admins get a routing 404).
+  constraints(AdminSessionConstraint.new) do
+    mount MissionControl::Jobs::Engine, at: "/admin/jobs"
+  end
 
   # Root — landing page for visitors, redirects to dashboard if logged in
   root "pages#landing"

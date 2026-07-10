@@ -33,12 +33,31 @@ RSpec.describe "Admin::Settings", type: :request do
       expect(admin.reload.first_name).to eq("Updated")
     end
 
-    it "updates password" do
+    it "updates password with the correct current password" do
       patch admin_settings_path, params: {
         section: "password",
-        user: { password: "newpassword123", password_confirmation: "newpassword123" },
+        user: { current_password: "oldpassword", password: "newpassword123", password_confirmation: "newpassword123" },
       }
       expect(response).to redirect_to(admin_settings_path)
+      expect(admin.reload.authenticate("newpassword123")).to be_truthy
+    end
+
+    it "rejects a password change with the wrong current password" do
+      patch admin_settings_path, params: {
+        section: "password",
+        user: { current_password: "wrongpassword", password: "newpassword123", password_confirmation: "newpassword123" },
+      }
+      expect(response).to redirect_to(admin_settings_path)
+      expect(admin.reload.authenticate("newpassword123")).to be_falsey
+      expect(admin.authenticate("oldpassword")).to be_truthy
+    end
+
+    it "rejects a password change with a blank current password" do
+      patch admin_settings_path, params: {
+        section: "password",
+        user: { current_password: "", password: "newpassword123", password_confirmation: "newpassword123" },
+      }
+      expect(admin.reload.authenticate("oldpassword")).to be_truthy
     end
 
     it "handles unknown section" do

@@ -26,18 +26,13 @@ RSpec.describe "Admin::Billings", type: :request do
   end
 
   describe "POST /admin/billing/create_checkout" do
-    context "in dev mode (no stripe key)" do
-      it "directly upgrades to pro" do
-        sign_in(admin)
-        post create_checkout_admin_billing_path, params: { plan: "pro" }
-        expect(org.reload.plan).to eq("pro")
-        expect(response).to redirect_to(admin_billing_path)
-      end
-
-      it "directly upgrades to enterprise" do
+    context "when billing is not enabled (no Stripe, no DEMO_BILLING)" do
+      it "does not change the plan and shows a billing-disabled notice" do
         sign_in(admin)
         post create_checkout_admin_billing_path, params: { plan: "enterprise" }
-        expect(org.reload.plan).to eq("enterprise")
+        expect(org.reload.plan).to eq("free")
+        expect(response).to redirect_to(admin_billing_path)
+        expect(flash[:alert]).to include("Billing is not enabled")
       end
 
       it "rejects invalid plan" do
@@ -51,6 +46,22 @@ RSpec.describe "Admin::Billings", type: :request do
         sign_in(candidate)
         post create_checkout_admin_billing_path, params: { plan: "pro" }
         expect(response).to redirect_to(root_path)
+      end
+    end
+
+    context "in demo mode (DEMO_BILLING=1)" do
+      around do |example|
+        ENV["DEMO_BILLING"] = "1"
+        example.run
+        ENV.delete("DEMO_BILLING")
+      end
+
+      it "switches the plan without payment" do
+        sign_in(admin)
+        post create_checkout_admin_billing_path, params: { plan: "pro" }
+        expect(org.reload.plan).to eq("pro")
+        expect(response).to redirect_to(admin_billing_path)
+        expect(flash[:notice]).to include("demo mode")
       end
     end
   end
