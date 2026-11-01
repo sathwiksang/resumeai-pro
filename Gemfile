@@ -41,7 +41,7 @@ gem "rtesseract"                  # OCR fallback
 gem "image_processing", "~> 1.2"
 
 # === Billing ===
-gem "stripe", "~> 13.0"
+gem "stripe", "~> 20.0"
 
 # === Utilities ===
 gem "rack-attack", "~> 6.7"
