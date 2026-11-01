@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 # === Core Framework ===
 gem "rails", "~> 8.1.2"
-gem "pg", "~> 1.5"
+gem "pg", "~> 1.7"
 gem "puma", ">= 6.0"
 gem "propshaft"
 gem "bootsnap", require: false
@@ -17,7 +17,7 @@ gem "kamal", require: false
 gem "thruster", require: false
 
 # === Frontend (Inertia + React) ===
-gem "inertia_rails", "~> 3.0"
+gem "inertia_rails", "~> 3.23"
 gem "vite_rails"
 
 # === Authentication & Authorization ===
@@ -33,8 +33,8 @@ gem "neighbor"                    # pgvector integration
 gem "faraday"                     # HTTP client for Ollama
 
 # === Document Parsing ===
-gem "pdf-reader", "~> 2.15"
-gem "docx", "~> 0.8"
+gem "pdf-reader", "~> 2.16"
+gem "docx", "~> 0.13"
 gem "rtesseract"                  # OCR fallback
 
 # === Image Processing (ActiveStorage) ===
