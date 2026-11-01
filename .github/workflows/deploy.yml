@@ -4,13 +4,17 @@ name: deploy
 on:
   push:
     branches: [main]
+  pull_request: # CI only; the deploy job is skipped
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   id-token: write # OIDC
   contents: read
 
-concurrency: deploy-resumeai
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('ci-{0}', github.ref) || 'deploy-resumeai' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   ECR: 606114586218.dkr.ecr.us-east-1.amazonaws.com
@@ -34,13 +38,13 @@ jobs:
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: System deps (PDF/OCR used by specs)
         run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils tesseract-ocr libvips
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -57,7 +61,7 @@ jobs:
   security:
     runs-on: ubuntu-24.04-arm
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
@@ -69,9 +73,10 @@ jobs:
 
   build-and-deploy:
     needs: ci
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-24.04-arm
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Assume AWS deploy role (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
