@@ -8,6 +8,11 @@ updates:
   groups:
     minor-and-patch:
       update-types: [minor, patch]
+  ignore:
+    # Checkout and the webhooks read subscription.current_period_end, and the specs
+    # mock every Stripe call, so a Stripe major needs a test-mode run, not just CI.
+    - dependency-name: stripe
+      update-types: [version-update:semver-major]
 - package-ecosystem: github-actions
   directory: "/"
   schedule:

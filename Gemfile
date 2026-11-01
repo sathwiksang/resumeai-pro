@@ -38,7 +38,7 @@ gem "docx", "~> 0.13"
 gem "rtesseract"                  # OCR fallback
 
 # === Image Processing (ActiveStorage) ===
-gem "image_processing", "~> 1.2"
+gem "image_processing", "~> 2.2"
 
 # === Billing ===
 gem "stripe", "~> 13.0"
