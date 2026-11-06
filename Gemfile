@@ -25,7 +25,7 @@ gem "bcrypt", "~> 3.1"
 gem "pundit", "~> 2.4"
 
 # === Multi-tenancy ===
-gem "acts_as_tenant", "~> 1.0"
+gem "acts_as_tenant", "~> 2.2"
 
 # === AI / LLM ===
 gem "ruby_llm"
