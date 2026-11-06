@@ -45,7 +45,7 @@ gem "stripe", "~> 13.5"
 
 # === Utilities ===
 gem "rack-attack", "~> 6.7"
-gem "pagy", "~> 9.0"             # Pagination
+gem "pagy", "~> 43.8"            # Pagination
 
 # === Monitoring ===
 gem "mission_control-jobs"
