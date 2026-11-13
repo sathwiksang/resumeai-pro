@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # === Core Framework ===
-gem "rails", "~> 8.1.2"
+gem "rails", "~> 8.1.4"
 gem "pg", "~> 1.7"
 gem "puma", ">= 6.0"
 gem "propshaft"
